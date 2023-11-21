@@ -19,5 +19,14 @@
     "properties-reader": "^2.1.1",
     "query-string": "^8.1.0",
     "uuid": "^8.3.2"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SimonLerouxx/PFI_NodeJs_Leroux_Leveiller.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SimonLerouxx/PFI_NodeJs_Leroux_Leveiller/issues"
+  },
+  "homepage": "https://github.com/SimonLerouxx/PFI_NodeJs_Leroux_Leveiller#readme"
 }
