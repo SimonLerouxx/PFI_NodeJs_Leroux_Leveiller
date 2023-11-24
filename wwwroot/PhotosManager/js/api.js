@@ -2,7 +2,7 @@
 
 const serverHost = "http://localhost:5000";
 const photos_API = "/api/photos";
-import { Session } from "./session.js";
+
     
 class API {
     static initHttpState() {
@@ -93,7 +93,6 @@ class API {
                     API.storeAccessToken(token.Access_token);
                     API.storeLoggedUser(token.User);
                     resolve(token.User);
-                    Session.timeout();
                 },
                 error: xhr => { API.setHttpErrorState(xhr); resolve(false); }
             });
