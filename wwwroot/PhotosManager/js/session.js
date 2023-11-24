@@ -1,3 +1,4 @@
+
 function createTimeoutPopup() {
     $('body').append(`
         <div class='popup'> 
@@ -30,6 +31,7 @@ function noTimeout() {
     clearTimeout(currentTimeouID);
 }
 function timeout() {
+    console.log("session timer started");
     startCountdown();
 }
 function startCountdown() {

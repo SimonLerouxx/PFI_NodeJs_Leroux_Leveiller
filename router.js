@@ -93,8 +93,9 @@ export const TOKEN_EndPoint = function (HttpContext) {
             let accountsController = new AccountsController(HttpContext);
             if (HttpContext.payload)
                 accountsController.login(HttpContext.payload);
-            else
+            else{
                 HttpContext.response.badRequest();
+            }
             return true;
         } catch (error) {
             console.log("Token_EndPoint Error message: \n", error.message);

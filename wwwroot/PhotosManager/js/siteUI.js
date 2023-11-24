@@ -52,7 +52,7 @@ function renderLogin(){
     $("#content").append(
 
         $(`
-        <h3></h3>
+        <h3>LOGIN</h3>
         <form class="form" id="loginForm">
             <input type='email' name='Email' id="Email" class="form-control" required RequireMessage='Veuillez entrer votre courriel' InvalidMessage='Courriel invalide' placeholder="adresse de courriel" value=''>
             <span style='color:red'></span>
