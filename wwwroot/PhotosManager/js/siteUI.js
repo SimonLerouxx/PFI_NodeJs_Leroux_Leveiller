@@ -115,7 +115,7 @@ function renderInscription() {
 
     $("#content").append(
 
-        $(`<form class="form" id="createProfilForm" method="POST">
+        $(`<form class="form" id="createProfilForm">
         <fieldset>
         <legend>Adresse de courriel</legend>
         <input type="email" class="form-control Email"name="Email"id="Email"placeholder="Courriel"requiredRequireMessage = 'Veuillez entrer votre courriel'
