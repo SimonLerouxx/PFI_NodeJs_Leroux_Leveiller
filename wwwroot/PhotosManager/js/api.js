@@ -11,6 +11,7 @@ class API {
         this.error = false;
     }
     static setHttpErrorState(xhr) {
+        console.log(xhr);
         if (xhr.responseJSON)
             this.currentHttpError = xhr.responseJSON.error_description;
         else
