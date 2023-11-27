@@ -14,34 +14,10 @@ function saveContentScrollPosition() {
 function restoreContentScrollPosition() {
     $("#content")[0].scrollTop = contentScrollPosition;
 }
-function UpdateHeader(string,menu) {
-    $("#newPhotoCmd").hide();
-    $(".viewTitle").text( string);
-    
+function updateHeader() {
+    //todo
 }
-function renderHeader(){
-    
-    $("#header").append(
-        $( `
-         <span title="Liste des photos" id="listPhotosCmd">
-                 <img src="images/PhotoCloudLogo.png" class="appLogo">
-             </span>
-             <span class="viewTitle">Login
-                 <div class="cmdIcon fa fa-plus" id="newPhotoCmd" title="Ajouter une photo"></div>
-             </span>
-             <div class="headerMenusContainer">
-                 <span>&nbsp;</span> <!--filler-->
-                 <i title="Modifier votre profil">
-                     <div class="UserAvatarSmall" userid="" id="editProfilCmd" style="background-image:url(')" title="Nicolas Chourot"></div>
-                 </i>
-                 <div class="dropdown ms-auto dropdownLayout">
-                     <!-- Articles de menu -->
-                 </div>
-             </div>
-             `
-     ))
-     $("#newPhotoCmd").hide();
-}
+
 
 
 
@@ -73,9 +49,6 @@ function renderAbout() {
 function renderLogin() {
     noTimeout(); // ne pas limiter le temps d’inactivité
     eraseContent();
-    
-    
-    UpdateHeader("Login","??")
     $("#newPhotoCmd").hide(); // camouffler l’icone de commande d’ajout de photo
     $("#content").append(
 
@@ -96,7 +69,7 @@ function renderLogin() {
 
     `));
 
-    
+
     var createAccount = document.getElementById("createProfilCmd");
 
     createAccount.addEventListener("click", function () {
@@ -110,7 +83,7 @@ function renderInscription() {
 
     noTimeout(); // ne pas limiter le temps d’inactivité
     eraseContent(); // effacer le conteneur #content
-    UpdateHeader("Inscription","createProfil");
+    //UpdateHeader("Inscription", "createProfil");
     $("#newPhotoCmd").hide(); // camouffler l’icone de commande d’ajout de photo
 
     $("#content").append(
@@ -152,24 +125,8 @@ function renderInscription() {
     </div>
 
 `));
-$('#loginForm').on("submit", async function (event) {
-
-    //Ne rentre pas dans la fonction
-    console.log("in login");
-    let loginData = getFormData($('#loginForm'));
-    console.log(loginData);
-    
-    event.preventDefault();// empêcher le fureteur de soumettre une requête de soumission
-    showWaitingGif(); // afficher GIF d’attente
-
-
-    let result = await API.login(loginData.Email,loginData.Password);
-    console.log(result);
-});
-
 
     //$('#loginCmd').on('click', renderLoginForm); // call back sur clic
-
     initFormValidation();
     initImageUploaders();
    // $('#abortCmd').on('click', renderLoginForm); // call back sur clic
@@ -177,20 +134,13 @@ $('#loginForm').on("submit", async function (event) {
         //addConflictValidation(API.checkConflictURL(), 'Email', 'saveUser');
     // call back la soumission du formulaire
 
-    $('#createProfilForm').on("submit", async function (event) {
-
-        //Ne rentre pas dans la fonction
-        console.log("in");
+    $('#createProfilForm').on("submit", function (event) {
         let profil = getFormData($('#createProfilForm'));
-        console.log(profil);
         delete profil.matchedPassword;
         delete profil.matchedEmail;
         event.preventDefault();// empêcher le fureteur de soumettre une requête de soumission
         showWaitingGif(); // afficher GIF d’attente
-
-
-        let result = await API.register(profil);
-        console.log(result);
+        createProfil(profil); // commander la création au service API
     });
 
 
