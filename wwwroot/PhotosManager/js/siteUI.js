@@ -14,11 +14,35 @@ function saveContentScrollPosition() {
 function restoreContentScrollPosition() {
     $("#content")[0].scrollTop = contentScrollPosition;
 }
-function updateHeader() {
-    //todo
+function UpdateHeader(string,menu) {
+    $("#newPhotoCmd").hide();
+    $(".viewTitle").text( string);
+    
 }
+function renderHeader(){
+    
+    $("#header").append(
+        $( `
+         <span title="Liste des photos" id="listPhotosCmd">
+                 <img src="images/PhotoCloudLogo.png" class="appLogo">
+             </span>
+             <span class="viewTitle">Login
+                 <div class="cmdIcon fa fa-plus" id="newPhotoCmd" title="Ajouter une photo"></div>
+             </span>
+             <div class="headerMenusContainer">
+                 <span>&nbsp;</span> <!--filler-->
+                 <i title="Modifier votre profil">
+                     <div class="UserAvatarSmall" userid="" id="editProfilCmd" style="background-image:url(')" title="Nicolas Chourot"></div>
+                 </i>
+                 <div class="dropdown ms-auto dropdownLayout">
+                     <!-- Articles de menu -->
+                 </div>
+             </div>
+             `
+     ))
+     $("#newPhotoCmd").hide();
 
-
+    }
 
 
 function renderAbout() {
@@ -76,6 +100,20 @@ function renderLogin() {
         renderInscription();
 
     });
+    $('#loginForm').on("submit",  function (event) {
+        event.preventDefault();
+        //Ne rentre pas dans la fonction
+        console.log("in login");
+        let loginData = getFormData($('#loginForm'));
+        console.log(loginData);
+        
+        // empêcher le fureteur de soumettre une requête de soumission
+        showWaitingGif(); // afficher GIF d’attente
+        let result = API.login(loginData.Email,loginData.Password);
+        console.log(result);
+    });
+
+
 
 }
 
