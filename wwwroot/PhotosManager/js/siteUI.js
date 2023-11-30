@@ -1,4 +1,6 @@
 let contentScrollPosition = 0;
+let loggedUser;
+Init_UI();
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Views rendering
 function showWaitingGif() {
@@ -14,35 +16,42 @@ function saveContentScrollPosition() {
 function restoreContentScrollPosition() {
     $("#content")[0].scrollTop = contentScrollPosition;
 }
-function UpdateHeader(string,menu) {
-    $("#newPhotoCmd").hide();
-    $(".viewTitle").text( string);
+function Init_UI() {
+    renderHeaderBase();
+    renderLogin();
     
+    $('#aboutCmd').on("click", function () {
+        renderAbout();
+    });
+    $('#loginCmd').on("click", function () {
+        renderLogin();
+    });
 }
-function renderHeader(){
-    
-    $("#header").append(
-        $( `
-         <span title="Liste des photos" id="listPhotosCmd">
-                 <img src="images/PhotoCloudLogo.png" class="appLogo">
-             </span>
-             <span class="viewTitle">Login
-                 <div class="cmdIcon fa fa-plus" id="newPhotoCmd" title="Ajouter une photo"></div>
-             </span>
-             <div class="headerMenusContainer">
-                 <span>&nbsp;</span> <!--filler-->
-                 <i title="Modifier votre profil">
-                     <div class="UserAvatarSmall" userid="" id="editProfilCmd" style="background-image:url(')" title="Nicolas Chourot"></div>
-                 </i>
-                 <div class="dropdown ms-auto dropdownLayout">
-                     <!-- Articles de menu -->
-                 </div>
-             </div>
-             `
-     ))
-     $("#newPhotoCmd").hide();
+
+
+function UpdateHeader(string, menu) {
+    $("#header").empty();
+    if (menu == "logged") {
+        
+        if (loggedUser.Authorizations["writeAccess"] == 1) {         
+            renderHeaderLoggedAdmin();
+
+        }
+        else{
+            renderHeaderLoggedAdmin();
+            $("#manageUserCm").hide();
+        }
 
     }
+    else {
+        renderHeaderBase();
+
+    }
+
+
+    $(".viewTitle").text(string);
+}
+
 
 
 function renderAbout() {
@@ -71,18 +80,22 @@ function renderAbout() {
 }
 
 function renderLogin() {
+    let EmailError = "";
+    let PwdError = "";
+
+    UpdateHeader("Login", "login");
+
     noTimeout(); // ne pas limiter le temps d’inactivité
-    eraseContent();
-    $("#newPhotoCmd").hide(); // camouffler l’icone de commande d’ajout de photo
+    eraseContent();// camouffler l’icone de commande d’ajout de photo
     $("#content").append(
 
         $(`
         <h3>LOGIN</h3>
         <form class="form" id="loginForm" method="POST">
             <input type='email' name='Email' id="Email" class="form-control" required RequireMessage='Veuillez entrer votre courriel' InvalidMessage='Courriel invalide' placeholder="Adresse de courriel" value=''>
-            <span style='color:red'></span>
+            <span style='color:red'>${EmailError}</span>
             <input type='password' name='Password' id="Password" placeholder='Mot de passe' class="form-control" required RequireMessage='Veuillez entrer votre mot de passe'>
-            <span style='color:red'></span>
+            <span style='color:red'>${PwdError}</span>
             <input type='submit' name='submit' id="submit" value="Entrer" class="form-control btn-primary">
         </form>
         <div class="form">
@@ -93,28 +106,21 @@ function renderLogin() {
 
     `));
 
-
     var createAccount = document.getElementById("createProfilCmd");
 
     createAccount.addEventListener("click", function () {
         renderInscription();
-
     });
-    $('#loginForm').on("submit",  function (event) {
+    $('#loginForm').on("submit", async function (event) {
         event.preventDefault();
         //Ne rentre pas dans la fonction
-        console.log("in login");
         let loginData = getFormData($('#loginForm'));
-        console.log(loginData);
-        
+
         // empêcher le fureteur de soumettre une requête de soumission
         showWaitingGif(); // afficher GIF d’attente
-        let result = API.login(loginData.Email,loginData.Password);
-        console.log(result);
+        loggedUser = await API.login(loginData.Email, loginData.Password);
+        UpdateHeader("Liste des photos", "logged");
     });
-
-
-
 }
 
 function renderInscription() {
@@ -164,12 +170,12 @@ function renderInscription() {
 
 `));
 
-    //$('#loginCmd').on('click', renderLoginForm); // call back sur clic
+    // call back sur clic
     initFormValidation();
     initImageUploaders();
-   // $('#abortCmd').on('click', renderLoginForm); // call back sur clic
+    // call back sur clic
     // ajouter le mécanisme de vérification de doublon de courriel
-        //addConflictValidation(API.checkConflictURL(), 'Email', 'saveUser');
+    //addConflictValidation(API.checkConflictURL(), 'Email', 'saveUser');
     // call back la soumission du formulaire
 
     $('#createProfilForm').on("submit", function (event) {
@@ -179,6 +185,7 @@ function renderInscription() {
         event.preventDefault();// empêcher le fureteur de soumettre une requête de soumission
         showWaitingGif(); // afficher GIF d’attente
         createProfil(profil); // commander la création au service API
+
     });
 
 
@@ -186,3 +193,134 @@ function renderInscription() {
     abort.addEventListener("click", function () { renderLogin(); });
 }
 
+
+
+
+function getFormData($form) {
+    const removeTag = new RegExp("(<[a-zA-Z0-9]+>)|(</[a-zA-Z0-9]+>)", "g");
+    var jsonObject = {};
+    $.each($form.serializeArray(), (index, control) => {
+        jsonObject[control.name] = control.value.replace(removeTag, "");
+    });
+    return jsonObject;
+}
+
+function renderHeaderLoggedAdmin() {
+
+    $("#header").append(
+        $(`
+         <span title="Liste des photos" id="listPhotosCmd">
+                 <img src="images/PhotoCloudLogo.png" class="appLogo">
+             </span>
+             <span class="viewTitle">Login
+                 <div class="cmdIcon fa fa-plus" id="newPhotoCmd" title="Ajouter une photo"></div>
+             </span>
+
+             <div class="headerMenusContainer">
+                 <span>&nbsp;</span> <!--filler-->
+                 <i title="Modifier votre profil">
+                     <div class="UserAvatarSmall" userid="" id="editProfilCmd" style="background-image:url('')" title="Nicolas Chourot">${loggedUser}</div>
+                 </i>
+                 <div class="dropdown ms-auto">
+            <div data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="cmdIcon fa fa-ellipsis-vertical"></i>
+            </div>
+            <div class="dropdown-menu noselect">
+                <div class="dropdown-divider"></div>
+                <span class="dropdown-item" id="manageUserCm">
+                <i class="menuIcon fas fa-user-cog mx-2"></i>
+                Gestion des usagers
+                </span>
+                <div class="dropdown-divider"></div>
+                <span class="dropdown-item" id="logoutCmd">
+                <i class="menuIcon fa fa-sign-out mx-2"></i>
+                Déconnexion
+                </span>
+                <span class="dropdown-item" id="editProfilMenuCmd">
+                <i class="menuIcon fa fa-user-edit mx-2"></i>
+                Modifier votre profil
+                </span>
+                <div class="dropdown-divider"></div>
+                <span class="dropdown-item" id="listPhotosMenuCmd">
+                <i class="menuIcon fa fa-image mx-2"></i>
+                Liste des photos
+                </span>
+                <div class="dropdown-divider"></div>
+                <span class="dropdown-item" id="sortByDateCmd">
+                <i class="menuIcon fa fa-check mx-2"></i>
+                <i class="menuIcon fa fa-calendar mx-2"></i>
+                Photos par date de création
+                </span>
+                <span class="dropdown-item" id="sortByOwnersCmd">
+                <i class="menuIcon fa fa-fw mx-2"></i>
+                <i class="menuIcon fa fa-users mx-2"></i>
+                Photos par créateur
+                </span>
+                <span class="dropdown-item" id="sortByLikesCmd">
+                <i class="menuIcon fa fa-fw mx-2"></i>
+                <i class="menuIcon fa fa-user mx-2"></i>
+                Photos les plus aiméés
+                </span>
+                <span class="dropdown-item" id="ownerOnlyCmd">
+                <i class="menuIcon fa fa-fw mx-2"></i>
+                <i class="menuIcon fa fa-user mx-2"></i>
+                Mes photos
+                </span>
+                <div class="dropdown-divider"></div>
+                <span class="dropdown-item" id="aboutCmd">
+                <i class="menuIcon fa fa-info-circle mx-2"></i>
+                À propos...
+                </span>
+                
+            </div>
+        </div>
+             </div>
+             `
+        ));
+
+}
+function renderHeaderBase() {
+
+    $("#header").append(
+        $(`
+         <span title="Liste des photos" id="listPhotosCmd">
+                 <img src="images/PhotoCloudLogo.png" class="appLogo">
+             </span>
+             <span class="viewTitle">Login
+                 <div class="cmdIcon fa fa-plus" id="newPhotoCmd" title="Ajouter une photo"></div>
+             </span>
+
+             <div class="headerMenusContainer">
+                 <span>&nbsp;</span> <!--filler-->
+                 <i title="Modifier votre profil">
+                     <div class="UserAvatarSmall" userid="" id="editProfilCmd" style="background-image:url('')" title="Nicolas Chourot">${loggedUser}</div>
+                 </i>
+                 <div class="dropdown ms-auto">
+            <div data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="cmdIcon fa fa-ellipsis-vertical"></i>
+            </div>
+            <div class="dropdown-menu noselect">
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item" id="loginCmd">
+                <i class="menuIcon fa fa-sign-in mx-2"></i> Connexion
+            </div>
+                <div class="dropdown-divider"></div>
+                <span class="dropdown-item" id="aboutCmd">
+                <i class="menuIcon fa fa-info-circle mx-2"></i>
+                À propos...
+                </span>
+                
+            </div>
+        </div>
+             </div>
+             `
+        ));
+        $("#newPhotoCmd").hide();
+        $('#aboutCmd').on("click", function () {
+            renderAbout();
+        });
+        $('#loginCmd').on("click", function () {
+            renderLogin();
+        });
+
+}
