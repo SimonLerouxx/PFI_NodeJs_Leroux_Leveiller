@@ -21,7 +21,10 @@ let infinite = -1;
 let timeLeft = infinite;
 let maxStallingTime = 12;
 
-function initTimeout(stallingTime = infinite, callback = timeoutCallBack) {
+//c lui tu changes pour changer le temps  de logout
+let timeRedirect =45;
+
+function initTimeout(stallingTime = timeRedirect, callback = timeoutCallBack) {
     maxStallingTime = stallingTime;
     timeoutCallBack = callback;
     createTimeoutPopup();
@@ -53,6 +56,8 @@ function startCountdown() {
                     clearTimeout(currentTimeouID);
                     closePopup();
                     timeoutCallBack();
+                    API.logout();
+                    renderLogin();
                 }
             }
         }, 1000);

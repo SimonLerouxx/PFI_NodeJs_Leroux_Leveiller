@@ -53,6 +53,13 @@ function UpdateHeader(string, menu) {
 }
 
 
+function createProfil(profil){
+    console.log("debut creation profil");
+    loggedUser = API.register(profil);
+    console.log("profil créé");
+
+}
+
 
 function renderAbout() {
     timeout();
@@ -90,7 +97,7 @@ function renderLogin() {
     $("#content").append(
 
         $(`
-        <h3>LOGIN</h3>
+        <h3></h3>
         <form class="form" id="loginForm" method="POST">
             <input type='email' name='Email' id="Email" class="form-control" required RequireMessage='Veuillez entrer votre courriel' InvalidMessage='Courriel invalide' placeholder="Adresse de courriel" value=''>
             <span style='color:red'>${EmailError}</span>
@@ -186,12 +193,15 @@ function renderInscription() {
         showWaitingGif(); // afficher GIF d’attente
         createProfil(profil); // commander la création au service API
 
+        //on devrait peut etre changer
+        renderLogin();
     });
 
 
     abort = document.getElementById("abortCmd");
     abort.addEventListener("click", function () { renderLogin(); });
 }
+
 
 
 
@@ -277,6 +287,14 @@ function renderHeaderLoggedAdmin() {
              </div>
              `
         ));
+
+        $('#logoutCmd').on("click", function (event) {
+           
+            console.log("try logout");
+            API.logout();
+            renderLogin();
+        });
+
 
 }
 function renderHeaderBase() {

@@ -90,6 +90,7 @@ class API {
                 type: 'POST',
                 data: JSON.stringify({ Email, Password }),
                 success: async token => {
+                    timeout();
                     API.storeAccessToken(token.Access_token);
                     API.storeLoggedUser(token.User);
                     resolve(token.User);
@@ -141,7 +142,6 @@ class API {
                 data: {},
                 headers: API.getBearerAuthorizationToken(),
                 success: () => {
-                    API.deConnect();
                     resolve(true);
                 },
                 error: xhr => { API.setHttpErrorState(xhr); resolve(false); }
