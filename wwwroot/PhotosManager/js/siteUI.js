@@ -56,8 +56,13 @@ function UpdateHeader(string, menu) {
 function createProfil(profil){
     console.log("debut creation profil");
     loggedUser = API.register(profil);
-    console.log("profil créé");
 
+}
+
+
+function modifyProfil(profil){
+    console.log("debut modification profil");
+    API.modifyUserProfil(profil);
 }
 
 
@@ -142,24 +147,24 @@ function renderInscription() {
         $(`<form class="form" id="createProfilForm">
         <fieldset>
         <legend>Adresse de courriel</legend>
-        <input type="email" class="form-control Email"name="Email"id="Email"placeholder="Courriel"requiredRequireMessage = 'Veuillez entrer votre courriel'
-        InvalidMessage = 'Courriel invalide'CustomErrorMessage ="Ce courriel est déjà utilisé"/>
+        <input type="email" class="form-control Email" name="Email" id="Email" placeholder="Courriel" requiredRequireMessage = 'Veuillez entrer votre courriel'
+        InvalidMessage = 'Courriel invalide' required CustomErrorMessage ="Ce courriel est déjà utilisé"/>
 
-        <input class="form-control MatchedInput"type="text"matchedInputId="Email"name="matchedEmail"id="matchedEmail"placeholder="Vérification"
-        requiredRequireMessage = 'Veuillez entrez de nouveau votre courriel'InvalidMessage="Les courriels ne correspondent pas" /></fieldset>
+        <input class="form-control MatchedInput" type="text" matchedInputId="Email" name="matchedEmail" id="matchedEmail" placeholder="Vérification"
+        requiredRequireMessage = 'Veuillez entrez de nouveau votre courriel' required InvalidMessage="Les courriels ne correspondent pas" /></fieldset>
 
         <fieldset>
         <legend>Mot de passe</legend>
-        <input type="password"lass="form-control"name="Password"id="Password"placeholder="Mot de passe"requiredRequireMessage = 'Veuillez entrer un mot de passe'
+        <input type="password"lass="form-control"name="Password"id="Password"placeholder="Mot de passe" required requiredRequireMessage = 'Veuillez entrer un mot de passe'
         InvalidMessage = 'Mot de passe trop court'/>
 
-        <input class="form-control MatchedInput"type="password"matchedInputId="Password"name="matchedPassword"id="matchedPassword"placeholder="Vérification" 
+        <input class="form-control MatchedInput"type="password" required matchedInputId="Password"name="matchedPassword"id="matchedPassword"placeholder="Vérification" 
         requiredInvalidMessage="Ne correspond pas au mot de passe" />
         </fieldset>
 
         <fieldset>
         <legend>Nom</legend>
-        <input type="text"class="form-control Alpha"name="Name"id="Name"placeholder="Nom"requiredRequireMessage = 'Veuillez entrer votre nom'
+        <input type="text"class="form-control Alpha" required name="Name"id="Name"placeholder="Nom"requiredRequireMessage = 'Veuillez entrer votre nom'
         InvalidMessage = 'Nom invalide'/>
         </fieldset>
 
@@ -197,13 +202,136 @@ function renderInscription() {
         renderLogin();
     });
 
+    addConflictValidation(serverHost+'/accounts/conflict',"Email",'saveUserCmd');
+
 
     abort = document.getElementById("abortCmd");
     abort.addEventListener("click", function () { renderLogin(); });
 }
 
 
+function renderModifyAccount(){
 
+    noTimeout(); // ne pas limiter le temps d’inactivité
+    eraseContent(); // effacer le conteneur #content
+
+    $("#newPhotoCmd").hide(); // camouffler l’icone de commande d’ajout de photo
+
+    $("#content").append(
+
+        $(`
+        <form class="form" id="editProfilForm"'>
+<input type="hidden" name="Id" id="Id" value="${loggedUser.Id}"/>
+<fieldset>
+<legend>Adresse de courriel</legend>
+<input type="email"
+class="form-control Email"
+name="Email"
+id="Email"
+placeholder="Courriel"
+required
+RequireMessage = 'Veuillez entrer votre courriel'
+InvalidMessage = 'Courriel invalide'
+required
+CustomErrorMessage ="Ce courriel est déjà utilisé"
+value="${loggedUser.Email}" >
+<input class="form-control MatchedInput"
+type="text"
+matchedInputId="Email"
+name="matchedEmail"
+id="matchedEmail"
+placeholder="Vérification"
+required
+RequireMessage = 'Veuillez entrez de nouveau votre courriel'
+InvalidMessage="Les courriels ne correspondent pas"
+value="${loggedUser.Email}" >
+</fieldset>
+<fieldset>
+<legend>Mot de passe</legend>
+<input type="password"
+class="form-control"
+name="Password"
+id="Password"
+placeholder="Mot de passe"
+required
+InvalidMessage = 'Mot de passe trop court' >
+<input class="form-control MatchedInput"
+type="password"
+matchedInputId="Password"
+name="matchedPassword"
+id="matchedPassword"
+placeholder="Vérification"
+required
+InvalidMessage="Ne correspond pas au mot de passe" >
+</fieldset>
+<fieldset>
+<legend>Nom</legend>
+<input type="text"
+class="form-control Alpha"
+name="Name"
+id="Name"
+placeholder="Nom"
+required
+RequireMessage = 'Veuillez entrer votre nom'
+InvalidMessage = 'Nom invalide'
+value="${loggedUser.Name}" >
+</fieldset>
+<fieldset>
+<legend>Avatar</legend>
+<div class='imageUploader'
+newImage='false'
+controlId='Avatar'
+imageSrc='${loggedUser.Avatar}'
+waitingImage="images/Loading_icon.gif">
+</div>
+</fieldset>
+<input type='button'
+name='submit'
+id='saveUserCmd'
+value="Enregistrer"
+class="form-control btn-primary">
+</form>
+<div class="cancel">
+<button class="form-control btn-secondary" id="abortCmd">Annuler</button>
+</div>
+<div class="cancel"> <hr>
+<a href="confirmDeleteProfil.php">
+<button class="form-control btn-warning">Effacer le compte</button>
+</a>
+
+`));
+
+    // call back sur clic
+    initFormValidation();
+    initImageUploaders();
+    // call back sur clic
+    // ajouter le mécanisme de vérification de doublon de courriel
+    //addConflictValidation(API.checkConflictURL(), 'Email', 'saveUser');
+    // call back la soumission du formulaire
+
+    $('#saveUserCmd').on("click", function (event) {
+        console.log("||||||||||||||||||||||||||||||");
+        let profil = getFormData($('#editProfilForm'));
+        delete profil.matchedPassword;
+        delete profil.matchedEmail;
+        event.preventDefault();// empêcher le fureteur de soumettre une requête de soumission
+        showWaitingGif(); // afficher GIF d’attente
+        modifyProfil(profil); // commander la création au service API
+
+        //on devrait peut etre changer
+        renderLogin();
+    });
+
+    addConflictValidation(serverHost+'/accounts/conflict',"Email",'saveUserCmd');
+
+
+    abort = document.getElementById("abortCmd");
+    abort.addEventListener("click", function () { renderLogin(); });
+
+
+
+
+}
 
 
 function getFormData($form) {
@@ -294,6 +422,13 @@ function renderHeaderLoggedAdmin() {
             API.logout();
             renderLogin();
         });
+
+
+        $('#editProfilMenuCmd').on("click", function (event) {
+           
+            renderModifyAccount();
+        });
+        
 
 
 }
