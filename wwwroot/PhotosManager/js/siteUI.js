@@ -1,5 +1,8 @@
+
 let contentScrollPosition = 0;
 let loggedUser;
+let EmailError = "";
+    let PwdError = "";
 Init_UI();
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Views rendering
@@ -92,8 +95,7 @@ function renderAbout() {
 }
 
 function renderLogin() {
-    let EmailError = "";
-    let PwdError = "";
+    
 
     UpdateHeader("Login", "login");
 
@@ -131,7 +133,23 @@ function renderLogin() {
         // empêcher le fureteur de soumettre une requête de soumission
         showWaitingGif(); // afficher GIF d’attente
         loggedUser = await API.login(loginData.Email, loginData.Password);
-        UpdateHeader("Liste des photos", "logged");
+        if(loggedUser){
+            console.log("good");
+            UpdateHeader("Liste des photos", "logged");
+            
+        }
+        else{
+            UpdateHeader("Login", "login");
+            console.log("bad");
+            EmailError = "Email introuvable";
+            PwdError = "Mot de passe introuvable";
+            renderLogin();
+            
+        }
+
+       
+
+        
     });
 }
 
@@ -139,8 +157,8 @@ function renderInscription() {
 
     noTimeout(); // ne pas limiter le temps d’inactivité
     eraseContent(); // effacer le conteneur #content
-    //UpdateHeader("Inscription", "createProfil");
-    $("#newPhotoCmd").hide(); // camouffler l’icone de commande d’ajout de photo
+    UpdateHeader("Inscription", "createProfil");
+     // camouffler l’icone de commande d’ajout de photo
 
     $("#content").append(
 
@@ -357,7 +375,7 @@ function renderHeaderLoggedAdmin() {
              <div class="headerMenusContainer">
                  <span>&nbsp;</span> <!--filler-->
                  <i title="Modifier votre profil">
-                     <div class="UserAvatarSmall" userid="" id="editProfilCmd" style="background-image:url('')" title="Nicolas Chourot">${loggedUser}</div>
+                     <div class="UserAvatarSmall" userid="${loggedUser.Id}" id="editProfilCmd" style="background-image:url('${loggedUser.Avatar}')" title="Nicolas Chourot"> </div>
                  </i>
                  <div class="dropdown ms-auto">
             <div data-bs-toggle="dropdown" aria-expanded="false">
@@ -428,6 +446,10 @@ function renderHeaderLoggedAdmin() {
            
             renderModifyAccount();
         });
+        $('#manageUserCm').on("click", function (event) {
+           renderManageUser();
+            console.log("werrewer");
+        });
         
 
 
@@ -439,15 +461,13 @@ function renderHeaderBase() {
          <span title="Liste des photos" id="listPhotosCmd">
                  <img src="images/PhotoCloudLogo.png" class="appLogo">
              </span>
-             <span class="viewTitle">Login
+             <span class="viewTitle">
                  <div class="cmdIcon fa fa-plus" id="newPhotoCmd" title="Ajouter une photo"></div>
              </span>
 
              <div class="headerMenusContainer">
                  <span>&nbsp;</span> <!--filler-->
-                 <i title="Modifier votre profil">
-                     <div class="UserAvatarSmall" userid="" id="editProfilCmd" style="background-image:url('')" title="Nicolas Chourot">${loggedUser}</div>
-                 </i>
+                 
                  <div class="dropdown ms-auto">
             <div data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="cmdIcon fa fa-ellipsis-vertical"></i>
@@ -468,7 +488,7 @@ function renderHeaderBase() {
              </div>
              `
         ));
-        $("#newPhotoCmd").hide();
+        
         $('#aboutCmd').on("click", function () {
             renderAbout();
         });
@@ -476,4 +496,20 @@ function renderHeaderBase() {
             renderLogin();
         });
 
+}
+function renderManageUser(){
+    noTimeout(); // ne pas limiter le temps d’inactivité
+    eraseContent(); // effacer le conteneur #content
+    UpdateHeader("Gestion des usagers", "logged");
+    let allUsers = API.GetAccounts();
+    console.log(allUsers);
+    $("#content").append(
+        $(`
+        
+
+
+
+
+            `
+       ));
 }
