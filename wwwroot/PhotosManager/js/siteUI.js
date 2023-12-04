@@ -3,6 +3,8 @@ let contentScrollPosition = 0;
 let loggedUser;
 let EmailError = "";
     let PwdError = "";
+    let VerifyError="";
+    let messageVerify ="";
 Init_UI();
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Views rendering
@@ -68,6 +70,74 @@ function modifyProfil(profil){
     API.modifyUserProfil(profil);
 }
 
+function renderDeleteSelf(){
+    eraseContent();
+    UpdateHeader("Retrait de compte", "delete");
+
+    $("#content").append(
+
+        $(`
+        <form class="form" id="deleteForm" method="POST">
+        <h4>Voulez-vous vraiment supprimer votre compte?</h4>
+            <input type='submit' name='delete' id="delete" value="Supprimer" class="form-control btn-primary">
+            <div class="cancel">
+            <button class="form-control btn-secondary" id="abortCmd">Annuler</button>
+            </div>
+        </form>
+
+    `));
+
+    
+    $('#deleteForm').on("submit", async function (event) {
+        event.preventDefault();
+
+
+        API.logout();
+        API.unsubscribeAccount(loggedUser.Id);
+
+        renderLogin();
+        
+    });
+
+    abort = document.getElementById("abortCmd");
+    abort.addEventListener("click", function () { renderLogin(); });
+
+}
+
+
+
+function renderVerify(){
+    eraseContent();
+    UpdateHeader("Verification", "verify");
+
+    $("#content").append(
+
+        $(`
+        <form class="form" id="verifyForm" method="POST">
+        <h4>Veuiller entre le code de vérification que vous avez reçu par courriel</h4>
+            <input type='text' name='code' id="code" class="form-control" required RequireMessage='Veuillez entrer votre code' InvalidMessage='Code invalide' placeholder="Code de Verification" value=''>
+            <span style='color:red'>${VerifyError}</span>
+            <input type='submit' name='submit' id="submitCode" value="Vérifier" class="form-control btn-primary">
+        </form>
+
+    `));
+
+    
+    $('#verifyForm').on("submit", async function (event) {
+        event.preventDefault();
+        let code = document.getElementById("code").value;
+
+        console.log("rentre");
+
+        API.verifyEmail(loggedUser.Id,code);
+        showWaitingGif();
+        UpdateHeader("Liste des photos", "logged");
+        
+    });
+
+
+}
+
 
 function renderAbout() {
     timeout();
@@ -106,6 +176,7 @@ function renderLogin() {
         $(`
         <h3></h3>
         <form class="form" id="loginForm" method="POST">
+            <span >${messageVerify}</span>
             <input type='email' name='Email' id="Email" class="form-control" required RequireMessage='Veuillez entrer votre courriel' InvalidMessage='Courriel invalide' placeholder="Adresse de courriel" value=''>
             <span style='color:red'>${EmailError}</span>
             <input type='password' name='Password' id="Password" placeholder='Mot de passe' class="form-control" required RequireMessage='Veuillez entrer votre mot de passe'>
@@ -127,6 +198,7 @@ function renderLogin() {
     });
     $('#loginForm').on("submit", async function (event) {
         event.preventDefault();
+        messageVerify="";
         //Ne rentre pas dans la fonction
         let loginData = getFormData($('#loginForm'));
 
@@ -135,7 +207,16 @@ function renderLogin() {
         loggedUser = await API.login(loginData.Email, loginData.Password);
         if(loggedUser){
             console.log("good");
-            UpdateHeader("Liste des photos", "logged");
+
+            console.log(loggedUser.Name);
+            console.log(loggedUser.VerifyCode);
+            if(loggedUser.VerifyCode == "verified"){
+                UpdateHeader("Liste des photos", "logged");
+            }
+            else{
+                renderVerify();
+            }
+            
             
         }
         else{
@@ -222,7 +303,7 @@ function renderInscription() {
 
     addConflictValidation(serverHost+'/accounts/conflict',"Email",'saveUserCmd');
 
-
+    messageVerify ="Votre compte a été créé. Veuillez prendre vos courriels pour récupérer votre code de vérification qui sera demandé lors de votre prochaine connexion"
     abort = document.getElementById("abortCmd");
     abort.addEventListener("click", function () { renderLogin(); });
 }
@@ -313,9 +394,8 @@ class="form-control btn-primary">
 <button class="form-control btn-secondary" id="abortCmd">Annuler</button>
 </div>
 <div class="cancel"> <hr>
-<a href="confirmDeleteProfil.php">
-<button class="form-control btn-warning">Effacer le compte</button>
-</a>
+<button class="form-control btn-warning" id="delete">Effacer le compte</button>
+</div>
 
 `));
 
@@ -338,6 +418,11 @@ class="form-control btn-primary">
 
         //on devrait peut etre changer
         renderLogin();
+    });
+
+    $('#delete').on("click", function (event) {
+           
+        renderDeleteSelf();
     });
 
     addConflictValidation(serverHost+'/accounts/conflict',"Email",'saveUserCmd');
@@ -440,6 +525,7 @@ function renderHeaderLoggedAdmin() {
             API.logout();
             renderLogin();
         });
+
 
 
         $('#editProfilMenuCmd').on("click", function (event) {

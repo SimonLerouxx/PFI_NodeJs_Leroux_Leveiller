@@ -101,6 +101,7 @@ class API {
     }
     static verifyEmail(userId, verifyCode) {
         API.initHttpState();
+        console.log("verify");
         return new Promise(resolve => {
             $.ajax({
                 url: serverHost + `/Accounts/verify?id=${userId}&code=${verifyCode}`,

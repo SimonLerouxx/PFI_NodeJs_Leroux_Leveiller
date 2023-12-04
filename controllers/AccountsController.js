@@ -32,6 +32,8 @@ export default class AccountsController extends Controller {
             if (this.repository != null) {
                 let user = this.repository.findByField("Email", loginInfo.Email);
                 if (user != null) {
+                    //Doit checker si verifier
+
                     if (user.Password == loginInfo.Password) {
                         user = this.repository.get(user.Id);
                         let newToken = TokenManager.create(user);
@@ -70,6 +72,7 @@ export default class AccountsController extends Controller {
     }
 
     sendConfirmedEmail(user) {
+        console.log("couriel verification envoyer");
         let html = `
                 Bonjour ${user.Name}, <br /> <br />
                 Votre courriel a été confirmé.
