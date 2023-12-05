@@ -541,7 +541,6 @@ function renderHeaderLoggedAdmin() {
     });
     $('#manageUserCm').on("click", function (event) {
         renderManageUser();
-        console.log("werrewer");
     });
 
 
@@ -605,43 +604,49 @@ function renderManageUser() {
         </div>
             `
         ));
-    allUsers.forEach(user => {
-        let blockedCommand = '<span class="deleteCmd fa-regular fa-circle greenCmd" unblockedCmd="${user.Id}></span>';
-        let adminCommand = '<span class="deleteCmd fa-regular fa-circle greenCmd" userCmd="${user.Id}></span>';
+        
+        allUsers.then(function(result) {
 
-        if(user.Authorizations["readAccess"] == 0){
-            let blockedCommand = '<span class="deleteCmd fa fa-ban redCmd" blockedCmd="${user.Id}></span>';
-        }
-        if(user.Authorizations["writeAccess"] == 2){
-            let blockedCommand = '<span class="deleteCmd fa fa-ban redCmd" adminCmd="${user.Id}></span>';
-        }
+
+            result.data.forEach(user => {
+                let blockedCommand = '<span class="deleteCmd fa-regular fa-circle greenCmd" unblockedCmd="${user.Id}></span>';
+                let adminCommand = '<span class="deleteCmd fa-regular fa-circle greenCmd" userCmd="${user.Id}></span>';
         
-        $("#UsersContainer").append(
-            $(
-                `<div class="UserContainer noselect" style="width: fit-content;">
-                    <div class="UserLayout">
-                        <div> <img src="http://localhost:5000/PhotosManager/images/PhotoCloudLogo.png" alt="" class="UserAvatar"></div>
-                        <div class="UserInfo">
-                            <div class="UserName">qweqwee</div>
-                            <div class="UserEmail">qweqwee</div>
-        
+                if(user.Authorizations["readAccess"] == 0){
+                    let blockedCommand = '<span class="deleteCmd fa fa-ban redCmd" blockedCmd="${user.Id}></span>';
+                }
+                if(user.Authorizations["writeAccess"] == 2){
+                    let blockedCommand = '<span class="deleteCmd fa fa-ban redCmd" adminCmd="${user.Id}></span>';
+                }
+                
+                $("#UsersContainer").append(
+                    $(
+                        `<div class="UserContainer noselect" style="width: fit-content;">
+                            <div class="UserLayout">
+                                <div> <img src="http://localhost:5000/PhotosManager/images/PhotoCloudLogo.png" alt="" class="UserAvatar"></div>
+                                <div class="UserInfo">
+                                    <div class="UserName">${user.Name}</div>
+                                    <div class="UserEmail">${user.Email}</div>
+                
+                                </div>
+                
+                
+                
+                            </div>
+                            <div class="UserCommandPanel" style="float: left;">
+                                <span class="deleteCmd fas fa-user-cog" promoteId="${user.Id}"></span>
+                                <span class="deleteCmd fas fa-user-cog" blockedID="${user.Id}></span>
+                                <span class="deleteCmd fas fa-user-cog" deleteId="${user.Id}></span>
+                            </div>
                         </div>
-        
-        
-        
-                    </div>
-                    <div class="UserCommandPanel" style="float: left;">
-                        <span class="deleteCmd fas fa-user-cog" promoteId="${user.Id}"></span>
-                        <span class="deleteCmd fas fa-user-cog" blockedID="${user.Id}></span>
-                        <span class="deleteCmd fas fa-user-cog" deleteId="${user.Id}></span>
-                    </div>
-                </div>
-                    
-                    
-                    
-                    
-                    `
-            )
-        )
-    });
+                            
+                            
+                            
+                            
+                            `
+                    )
+                )
+            });
+        });
+    
 }

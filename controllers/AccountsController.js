@@ -13,17 +13,19 @@ export default class AccountsController extends Controller {
         super(HttpContext, new Repository(new UserModel()), Authorizations.admin());
     }
     index(id) {
+        
         if (id != undefined) {
-            if (Authorizations.readGranted(this.HttpContext, Authorizations.admin()))
+           if (Authorizations.readGranted(this.HttpContext, Authorizations.admin()))
                 this.HttpContext.response.JSON(this.repository.get(id));
             else
-                this.HttpContext.response.unAuthorized("Unauthorized access");
+               this.HttpContext.response.unAuthorized("Unauthorized access");
         }
         else {
-            if (Authorizations.readGranted(this.HttpContext, Authorizations.admin()))
-                this.HttpContext.response.JSON(this.repository.getAll(this.HttpContext.path.params), this.repository.ETag, true, Authorizations.admin());
-            else
-                this.HttpContext.response.unAuthorized("Unauthorized access");
+            this.HttpContext.response.JSON(this.repository.getAll());
+          //  if (Authorizations.readGranted(this.HttpContext, Authorizations.admin()))
+          //      this.HttpContext.response.JSON(this.repository.getAll(this.HttpContext.path.params), this.repository.ETag, true, Authorizations.admin());
+           // else
+              //  this.HttpContext.response.unAuthorized("Unauthorized access");
         }
     }
     // POST: /token body payload[{"Email": "...", "Password": "..."}]
