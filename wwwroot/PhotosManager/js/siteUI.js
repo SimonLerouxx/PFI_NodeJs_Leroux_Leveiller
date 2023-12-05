@@ -2,9 +2,9 @@
 let contentScrollPosition = 0;
 let loggedUser;
 let EmailError = "";
-    let PwdError = "";
-    let VerifyError="";
-    let messageVerify ="";
+let PwdError = "";
+let VerifyError = "";
+let messageVerify = "";
 Init_UI();
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Views rendering
@@ -24,7 +24,7 @@ function restoreContentScrollPosition() {
 function Init_UI() {
     renderHeaderBase();
     renderLogin();
-    
+
     $('#aboutCmd').on("click", function () {
         renderAbout();
     });
@@ -37,12 +37,12 @@ function Init_UI() {
 function UpdateHeader(string, menu) {
     $("#header").empty();
     if (menu == "logged") {
-        
-        if (loggedUser.Authorizations["writeAccess"] == 1) {         
+
+        if (loggedUser.Authorizations["writeAccess"] == 1) {
             renderHeaderLoggedAdmin();
 
         }
-        else{
+        else {
             renderHeaderLoggedAdmin();
             $("#manageUserCm").hide();
         }
@@ -58,19 +58,19 @@ function UpdateHeader(string, menu) {
 }
 
 
-function createProfil(profil){
+function createProfil(profil) {
     console.log("debut creation profil");
     loggedUser = API.register(profil);
 
 }
 
 
-function modifyProfil(profil){
+function modifyProfil(profil) {
     console.log("debut modification profil");
     API.modifyUserProfil(profil);
 }
 
-function renderDeleteSelf(){
+function renderDeleteSelf() {
     eraseContent();
     UpdateHeader("Retrait de compte", "delete");
 
@@ -87,7 +87,7 @@ function renderDeleteSelf(){
 
     `));
 
-    
+
     $('#deleteForm').on("submit", async function (event) {
         event.preventDefault();
 
@@ -96,7 +96,7 @@ function renderDeleteSelf(){
         API.unsubscribeAccount(loggedUser.Id);
 
         renderLogin();
-        
+
     });
 
     abort = document.getElementById("abortCmd");
@@ -106,7 +106,7 @@ function renderDeleteSelf(){
 
 
 
-function renderVerify(){
+function renderVerify() {
     eraseContent();
     UpdateHeader("Verification", "verify");
 
@@ -122,17 +122,17 @@ function renderVerify(){
 
     `));
 
-    
+
     $('#verifyForm').on("submit", async function (event) {
         event.preventDefault();
         let code = document.getElementById("code").value;
 
         console.log("rentre");
 
-        API.verifyEmail(loggedUser.Id,code);
+        API.verifyEmail(loggedUser.Id, code);
         showWaitingGif();
         UpdateHeader("Liste des photos", "logged");
-        
+
     });
 
 
@@ -165,7 +165,7 @@ function renderAbout() {
 }
 
 function renderLogin() {
-    
+
 
     UpdateHeader("Login", "login");
 
@@ -198,39 +198,46 @@ function renderLogin() {
     });
     $('#loginForm').on("submit", async function (event) {
         event.preventDefault();
-        messageVerify="";
+        messageVerify = "";
         //Ne rentre pas dans la fonction
         let loginData = getFormData($('#loginForm'));
 
         // empêcher le fureteur de soumettre une requête de soumission
         showWaitingGif(); // afficher GIF d’attente
         loggedUser = await API.login(loginData.Email, loginData.Password);
-        if(loggedUser){
+        if (loggedUser) {
             console.log("good");
 
             console.log(loggedUser.Name);
             console.log(loggedUser.VerifyCode);
-            if(loggedUser.VerifyCode == "verified"){
+            if (loggedUser.VerifyCode == "verified") {
                 UpdateHeader("Liste des photos", "logged");
+                API.eraseAccessToken();
             }
-            else{
+            else {
                 renderVerify();
             }
-            
-            
+
+
         }
-        else{
+        else {
             UpdateHeader("Login", "login");
-            console.log("bad");
-            EmailError = "Email introuvable";
-            PwdError = "Mot de passe introuvable";
+            if (API.currentStatus == 481) {
+                PwdError = "";
+                EmailError = "Email introuvable";
+            }
+            else if (API.currentStatus == 482) {
+                EmailError = "";
+                PwdError = "Mot de passe introuvable";
+            }
             renderLogin();
-            
+            $("#Email").text(loginData.Email);
+
         }
 
-       
 
-        
+
+
     });
 }
 
@@ -239,7 +246,7 @@ function renderInscription() {
     noTimeout(); // ne pas limiter le temps d’inactivité
     eraseContent(); // effacer le conteneur #content
     UpdateHeader("Inscription", "createProfil");
-     // camouffler l’icone de commande d’ajout de photo
+    // camouffler l’icone de commande d’ajout de photo
 
     $("#content").append(
 
@@ -301,15 +308,15 @@ function renderInscription() {
         renderLogin();
     });
 
-    addConflictValidation(serverHost+'/accounts/conflict',"Email",'saveUserCmd');
+    addConflictValidation(serverHost + '/accounts/conflict', "Email", 'saveUserCmd');
 
-    messageVerify ="Votre compte a été créé. Veuillez prendre vos courriels pour récupérer votre code de vérification qui sera demandé lors de votre prochaine connexion"
+    messageVerify = "Votre compte a été créé. Veuillez prendre vos courriels pour récupérer votre code de vérification qui sera demandé lors de votre prochaine connexion"
     abort = document.getElementById("abortCmd");
     abort.addEventListener("click", function () { renderLogin(); });
 }
 
 
-function renderModifyAccount(){
+function renderModifyAccount() {
 
     noTimeout(); // ne pas limiter le temps d’inactivité
     eraseContent(); // effacer le conteneur #content
@@ -421,11 +428,11 @@ class="form-control btn-primary">
     });
 
     $('#delete').on("click", function (event) {
-           
+
         renderDeleteSelf();
     });
 
-    addConflictValidation(serverHost+'/accounts/conflict',"Email",'saveUserCmd');
+    addConflictValidation(serverHost + '/accounts/conflict', "Email", 'saveUserCmd');
 
 
     abort = document.getElementById("abortCmd");
@@ -519,24 +526,24 @@ function renderHeaderLoggedAdmin() {
              `
         ));
 
-        $('#logoutCmd').on("click", function (event) {
-           
-            console.log("try logout");
-            API.logout();
-            renderLogin();
-        });
+    $('#logoutCmd').on("click", function (event) {
+
+        console.log("try logout");
+        API.logout();
+        renderLogin();
+    });
 
 
 
-        $('#editProfilMenuCmd').on("click", function (event) {
-           
-            renderModifyAccount();
-        });
-        $('#manageUserCm').on("click", function (event) {
-           renderManageUser();
-            console.log("werrewer");
-        });
-        
+    $('#editProfilMenuCmd').on("click", function (event) {
+
+        renderModifyAccount();
+    });
+    $('#manageUserCm').on("click", function (event) {
+        renderManageUser();
+        console.log("werrewer");
+    });
+
 
 
 }
@@ -574,16 +581,16 @@ function renderHeaderBase() {
              </div>
              `
         ));
-        
-        $('#aboutCmd').on("click", function () {
-            renderAbout();
-        });
-        $('#loginCmd').on("click", function () {
-            renderLogin();
-        });
+
+    $('#aboutCmd').on("click", function () {
+        renderAbout();
+    });
+    $('#loginCmd').on("click", function () {
+        renderLogin();
+    });
 
 }
-function renderManageUser(){
+function renderManageUser() {
     noTimeout(); // ne pas limiter le temps d’inactivité
     eraseContent(); // effacer le conteneur #content
     UpdateHeader("Gestion des usagers", "logged");
@@ -591,11 +598,50 @@ function renderManageUser(){
     console.log(allUsers);
     $("#content").append(
         $(`
-        
+        <div class="UserRow" id="UsersContainer">
 
 
 
-
+        </div>
             `
-       ));
+        ));
+    allUsers.forEach(user => {
+        let blockedCommand = '<span class="deleteCmd fa-regular fa-circle greenCmd" unblockedCmd="${user.Id}></span>';
+        let adminCommand = '<span class="deleteCmd fa-regular fa-circle greenCmd" userCmd="${user.Id}></span>';
+
+        if(user.Authorizations["readAccess"] == 0){
+            let blockedCommand = '<span class="deleteCmd fa fa-ban redCmd" blockedCmd="${user.Id}></span>';
+        }
+        if(user.Authorizations["writeAccess"] == 2){
+            let blockedCommand = '<span class="deleteCmd fa fa-ban redCmd" adminCmd="${user.Id}></span>';
+        }
+        
+        $("#UsersContainer").append(
+            $(
+                `<div class="UserContainer noselect" style="width: fit-content;">
+                    <div class="UserLayout">
+                        <div> <img src="http://localhost:5000/PhotosManager/images/PhotoCloudLogo.png" alt="" class="UserAvatar"></div>
+                        <div class="UserInfo">
+                            <div class="UserName">qweqwee</div>
+                            <div class="UserEmail">qweqwee</div>
+        
+                        </div>
+        
+        
+        
+                    </div>
+                    <div class="UserCommandPanel" style="float: left;">
+                        <span class="deleteCmd fas fa-user-cog" promoteId="${user.Id}"></span>
+                        <span class="deleteCmd fas fa-user-cog" blockedID="${user.Id}></span>
+                        <span class="deleteCmd fas fa-user-cog" deleteId="${user.Id}></span>
+                    </div>
+                </div>
+                    
+                    
+                    
+                    
+                    `
+            )
+        )
+    });
 }
