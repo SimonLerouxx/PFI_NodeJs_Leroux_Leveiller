@@ -1,1 +1,55 @@
-[{"Id":"17988070-7f22-11ee-b433-0bad428eeaac","Email":"Nicolas.Chourot@clg.qc.ca","Password":"password","Name":"Nicolas Chourot","Avatar":"f5795080-4468-11ee-8281-2f600646bb7f.jpeg","Created":1699734739,"Authorizations":{"readAccess":1,"writeAccess":1},"VerifyCode":"verified"},{"Id":"13d91630-818d-11ee-b89b-c91bf460b1a8","Email":"Saliha.Yacoub@clg.qc.ca","Password":"password","Name":"Saliha Yacoub","Avatar":"13d91631-818d-11ee-b89b-c91bf460b1a8.jpeg","Created":1700057920,"Authorizations":{"readAccess":2,"writeAccess":2},"VerifyCode":"verified"},{"Id":"ae8a0b90-92c1-11ee-bc52-0b2fa05bb0a8","Email":"simonleroux15@gmail.com","Password":"password","Name":"SIm12","Avatar":"44f348a0-93f1-11ee-9c97-19f0f9a9fc7d.jpeg","Created":1701838754,"Authorizations":{"readAccess":1,"writeAccess":1},"VerifyCode":"verified"},{"Id":"9b987fb0-93f4-11ee-8695-6fa8fd4a2973","Email":"simonleroux5@gmail.com","Password":"password","Name":"SimonLeroux","Avatar":"9b98a6c0-93f4-11ee-8695-6fa8fd4a2973.jpeg","Created":1701838929,"VerifyCode":"verified","Authorizations":{"readAccess":1,"writeAccess":1}}]
+[
+    {
+        "Id": "17988070-7f22-11ee-b433-0bad428eeaac",
+        "Email": "Nicolas.Chourot@clg.qc.ca",
+        "Password": "password",
+        "Name": "Nicolas Chourot",
+        "Avatar": "f5795080-4468-11ee-8281-2f600646bb7f.jpeg",
+        "Created": 1699734739,
+        "Authorizations": {
+            "readAccess": 2,
+            "writeAccess": 2
+        },
+        "VerifyCode": "verified"
+    },
+    {
+        "Id": "13d91630-818d-11ee-b89b-c91bf460b1a8",
+        "Email": "Saliha.Yacoub@clg.qc.ca",
+        "Password": "password",
+        "Name": "Saliha Yacoub",
+        "Avatar": "13d91631-818d-11ee-b89b-c91bf460b1a8.jpeg",
+        "Created": 1700057920,
+        "Authorizations": {
+            "readAccess": 2,
+            "writeAccess": 2
+        },
+        "VerifyCode": "verified"
+    },
+    {
+        "Id": "ae8a0b90-92c1-11ee-bc52-0b2fa05bb0a8",
+        "Email": "simonleroux15@gmail.com",
+        "Password": "************",
+        "Name": "SIm12",
+        "Avatar": "3d406d80-92c1-11ee-8e02-bb51dd0c27bb.jpeg",
+        "Created": 1701882211,
+        "Authorizations": {
+            "readAccess": 1,
+            "writeAccess": 1
+        },
+        "VerifyCode": "verified",
+        "adminSender": "17988070-7f22-11ee-b433-0bad428eeaac"
+    },
+    {
+        "Id": "9b987fb0-93f4-11ee-8695-6fa8fd4a2973",
+        "Email": "simonleroux5@gmail.com",
+        "Password": "password",
+        "Name": "SimonLeroux",
+        "Avatar": "9b98a6c0-93f4-11ee-8695-6fa8fd4a2973.jpeg",
+        "Created": 1701838929,
+        "VerifyCode": "verified",
+        "Authorizations": {
+            "readAccess": 1,
+            "writeAccess": 1
+        }
+    }
+]

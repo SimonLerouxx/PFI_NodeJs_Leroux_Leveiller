@@ -38,7 +38,7 @@ function UpdateHeader(string, menu) {
     $("#header").empty();
     if (menu == "logged") {
 
-        if (loggedUser.Authorizations["writeAccess"] == 1) {
+        if (loggedUser.Authorizations["writeAccess"] == 2) {
             renderHeaderLoggedAdmin();
 
         }
@@ -604,39 +604,35 @@ function renderManageUser() {
         </div>
             `
         ));
-        
-        allUsers.then(function(result) {
+
+    allUsers.then(function (result) {
 
 
-            result.data.forEach(user => {
-                let blockedCommand = '<span class="deleteCmd fa-regular fa-circle greenCmd" unblockedCmd="${user.Id}></span>';
-                let adminCommand = '<span class="deleteCmd fa-regular fa-circle greenCmd" userCmd="${user.Id}></span>';
-        
-                if(user.Authorizations["readAccess"] == 0){
-                    let blockedCommand = '<span class="deleteCmd fa fa-ban redCmd" blockedCmd="${user.Id}></span>';
-                }
-                if(user.Authorizations["writeAccess"] == 2){
-                    let blockedCommand = '<span class="deleteCmd fa fa-ban redCmd" adminCmd="${user.Id}></span>';
-                }
-                
-                $("#UsersContainer").append(
-                    $(
-                        `<div class="UserContainer noselect" style="width: fit-content;">
-                            <div class="UserLayout">
-                                <div> <img src="http://localhost:5000/PhotosManager/images/PhotoCloudLogo.png" alt="" class="UserAvatar"></div>
+        result.data.forEach(user => {
+            let blockedCommand = `<span class="cmdIconVisible blockCmd fa-regular fa-circle greenCmd" blockCmdId="${user.Id}"  title="Bloquer"></span>`;
+            let adminCommand = `<span class="cmdIconVisible dodgerblueCmd adminPromoteCmd fas fa-user-alt" promoteCmdId="${user.Id}" title="Promouvoir"></span>`;
+
+            if (user.Authorizations["readAccess"] == 0) {
+                blockedCommand = `<span class="cmdIconVisible unblockCmd fa fa-ban redCmd" unblockCmdId="${user.Id}" title="Debloquer"></span>`;
+            }
+            if (user.Authorizations["writeAccess"] == 2) {
+                adminCommand = `<span class="cmdIconVisible dodgerblueCmd adminDemoteCmd fas fa-user-cog" demoteCmdId="${user.Id}"  title="Retirer les droits"></span>`;
+            }
+            $("#UsersContainer").append(
+                $(
+                    `<div class="UserContainer noselect" style="width: fit-content;">
+                            <div class="UserLayout" style:"width:400px;">
+                                <div> <img src="${user.Avatar}" alt="" class="UserAvatar"></div>
                                 <div class="UserInfo">
                                     <div class="UserName">${user.Name}</div>
                                     <div class="UserEmail">${user.Email}</div>
                 
-                                </div>
-                
-                
-                
+                                </div>     
                             </div>
-                            <div class="UserCommandPanel" style="float: left;">
-                                <span class="deleteCmd fas fa-user-cog" promoteId="${user.Id}"></span>
-                                <span class="deleteCmd fas fa-user-cog" blockedID="${user.Id}></span>
-                                <span class="deleteCmd fas fa-user-cog" deleteId="${user.Id}></span>
+                            <div class="UserCommandPanel">
+                                ${adminCommand}
+                                ${blockedCommand}
+                                <span class="cmdIconVisible deleteCmd fas fa-user-slash goldenrodCmd " deleteId="${user.Id}"  title="Delete user"></span>
                             </div>
                         </div>
                             
@@ -644,9 +640,77 @@ function renderManageUser() {
                             
                             
                             `
-                    )
                 )
+            )
+
+            $(".adminPromoteCmd").on("click", function () {
+                saveContentScrollPosition();
+                let UpdateProfil = result.data.find(user => user["Id"] == $(this).attr("promoteCmdId"));
+                UpdateProfil.Authorizations["readAccess"] = 2;
+                UpdateProfil.Authorizations["writeAccess"] = 2;
+                modifyProfil(UpdateProfil).then(() => {
+                    renderManageUser();
+                });
             });
+            $(".adminDemoteCmd").on("click", function () {
+                saveContentScrollPosition();
+                let UpdateProfil = result.data.find(user => user["Id"] == $(this).attr("demoteCmdId"));
+                UpdateProfil.Authorizations["readAccess"] = 1;
+                UpdateProfil.Authorizations["writeAccess"] = 1;
+                modifyProfil(UpdateProfil).then(() => {
+                    renderManageUser();
+                });
+            });
+            $(".deleteCmd").on("click", function () {
+                saveContentScrollPosition();
+                renderDeleteForm($(this).attr("deleteId"));
+            });
+            $(".unblockCmd").on("click", function () {
+                saveContentScrollPosition();
+                let UpdateProfil = result.data.find(user => user["Id"] == $(this).attr("unblockCmdId"));
+                UpdateProfil.Authorizations["readAccess"] = 1;
+                UpdateProfil.Authorizations["writeAccess"] = 1;
+                modifyProfil(UpdateProfil).then(() => {
+                    renderManageUser();
+                });
+            });
+            $(".blockCmd").on("click", function () {
+                saveContentScrollPosition();
+                let UpdateProfil = result.data.find(user => user["Id"] == $(this).attr("blockCmd"));
+                UpdateProfil.Authorizations["readAccess"] = 0;
+                UpdateProfil.Authorizations["writeAccess"] = 0;
+                modifyProfil(UpdateProfil).then(() => {
+                    renderManageUser();
+                });
+            })
         });
-    
+    });
+
+}
+function renderDeleteForm(id) {
+    eraseContent();
+    UpdateHeader("Retrait de compte", "delete");
+
+    $("#content").append(
+
+        $(`
+        <form class="form" id="deleteForm" method="POST">
+        <h4>Voulez-vous vraiment supprimer ce compte?</h4>
+            <input type='submit' name='delete' id="delete" value="Supprimer" class="form-control btn-primary"><br>
+            <div class="cancel">
+            <button class="form-control btn-secondary" id="abortCmd">Annuler</button>
+            </div>
+        </form>
+
+    `));
+
+
+    $('#deleteForm').on("submit", async function (event) {
+        event.preventDefault();
+
+
+        API.unsubscribeAccount(id);
+
+        renderManageUser();
+    });
 }

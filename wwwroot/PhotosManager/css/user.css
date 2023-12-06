@@ -51,7 +51,7 @@
 
 .UserLayout {
     display: grid;
-    grid-template-columns: 60px auto;
+    grid-template-columns: 60px 400px;
     padding: 6px;
     gap: 4px;
     align-items: center;
