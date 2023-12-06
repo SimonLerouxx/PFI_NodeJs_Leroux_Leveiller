@@ -418,7 +418,6 @@ class="form-control btn-primary">
         delete profil.matchedPassword;
         delete profil.matchedEmail;
         loggedUser = profil;
-        console.log(profil.Name);
         event.preventDefault();// empêcher le fureteur de soumettre une requête de soumission
         showWaitingGif(); // afficher GIF d’attente
         modifyProfil(profil); // commander la création au service API
@@ -645,11 +644,13 @@ function renderManageUser() {
 
             $(".adminPromoteCmd").on("click", function () {
                 saveContentScrollPosition();
-                console.log(result.data.find((user) => { return user["Id"] == $(this).attr("promoteCmdId") }));
+                //console.log(result.data.find((user) => { return user["Id"] == $(this).attr("promoteCmdId") }));
 
                 let UpdateProfil = result.data.find((user) => { return user["Id"] == $(this).attr("promoteCmdId") });
                 UpdateProfil.Authorizations["readAccess"] = 2;
                 UpdateProfil.Authorizations["writeAccess"] = 2;
+                UpdateProfil.Avatar = UpdateProfil.Avatar.toString().slice(39,UpdateProfil.Avatar.length);
+                console.log(UpdateProfil);
                 modifyProfil(UpdateProfil);
                 renderManageUser();
             });
