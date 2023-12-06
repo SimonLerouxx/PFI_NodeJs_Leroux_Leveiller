@@ -645,12 +645,13 @@ function renderManageUser() {
 
             $(".adminPromoteCmd").on("click", function () {
                 saveContentScrollPosition();
-                let UpdateProfil = result.data.find(user => user["Id"] == $(this).attr("promoteCmdId"));
+                console.log(result.data.find((user) => { return user["Id"] == $(this).attr("promoteCmdId") }));
+
+                let UpdateProfil = result.data.find((user) => { return user["Id"] == $(this).attr("promoteCmdId") });
                 UpdateProfil.Authorizations["readAccess"] = 2;
                 UpdateProfil.Authorizations["writeAccess"] = 2;
-                modifyProfil(UpdateProfil).then(() => {
-                    renderManageUser();
-                });
+                modifyProfil(UpdateProfil);
+                renderManageUser();
             });
             $(".adminDemoteCmd").on("click", function () {
                 saveContentScrollPosition();
@@ -676,6 +677,7 @@ function renderManageUser() {
             });
             $(".blockCmd").on("click", function () {
                 saveContentScrollPosition();
+                console.log(result.data);
                 let UpdateProfil = result.data.find(user => user["Id"] == $(this).attr("blockCmd"));
                 UpdateProfil.Authorizations["readAccess"] = 0;
                 UpdateProfil.Authorizations["writeAccess"] = 0;
