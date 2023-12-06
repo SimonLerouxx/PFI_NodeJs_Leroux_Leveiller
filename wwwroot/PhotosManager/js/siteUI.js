@@ -208,8 +208,6 @@ function renderLogin() {
         if (loggedUser) {
             console.log("good");
 
-            console.log(loggedUser.Name);
-            console.log(loggedUser.VerifyCode);
             if (loggedUser.VerifyCode == "verified") {
                 UpdateHeader("Liste des photos", "logged");
                 API.eraseAccessToken();
@@ -419,10 +417,12 @@ class="form-control btn-primary">
         let profil = getFormData($('#editProfilForm'));
         delete profil.matchedPassword;
         delete profil.matchedEmail;
+        loggedUser = profil;
+        console.log(profil.Name);
         event.preventDefault();// empêcher le fureteur de soumettre une requête de soumission
         showWaitingGif(); // afficher GIF d’attente
         modifyProfil(profil); // commander la création au service API
-
+        API.logout();
         //on devrait peut etre changer
         renderLogin();
     });

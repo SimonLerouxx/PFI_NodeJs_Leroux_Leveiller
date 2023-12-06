@@ -34,8 +34,6 @@ export default class AccountsController extends Controller {
             if (this.repository != null) {
                 let user = this.repository.findByField("Email", loginInfo.Email);
                 if (user != null) {
-                    //Doit checker si verifier
-
                     if (user.Password == loginInfo.Password) {
                         user = this.repository.get(user.Id);
                         let newToken = TokenManager.create(user);
@@ -63,6 +61,19 @@ export default class AccountsController extends Controller {
     sendVerificationEmail(user) {
         // bypass model bindeExtraData wich hide the user verifyCode
         user = this.repository.findByField("Id", user.Id);
+        let html = `
+                Bonjour ${user.Name}, <br /> <br />
+                Voici votre code pour confirmer votre adresse de courriel
+                <br />
+                <h3>${user.VerifyCode}</h3>
+            `;
+        const gmail = new Gmail();
+        gmail.send(user.Email, 'Vérification de courriel...', html);
+    }
+
+    modifyVerificationEmail(user) {
+        // bypass model bindeExtraData wich hide the user verifyCode
+        //user = this.repository.findByField("Id", user.Id);
         let html = `
                 Bonjour ${user.Name}, <br /> <br />
                 Voici votre code pour confirmer votre adresse de courriel
@@ -144,7 +155,7 @@ export default class AccountsController extends Controller {
     // PUT:account/modify body payload[{"Id": 0, "Name": "...", "Email": "...", "Password": "..."}]
     modify(user) {
         // empty asset members imply no change and there values will be taken from the stored record
-        if (Authorizations.writeGranted(this.HttpContext, Authorizations.user())) {
+        //if (Authorizations.writeGranted(this.HttpContext, Authorizations.user())) {
             if (this.repository != null) {
                 user.Created = utilities.nowInSeconds();
                 let foundedUser = this.repository.findByField("Id", user.Id);
@@ -155,12 +166,16 @@ export default class AccountsController extends Controller {
                         user.Password = foundedUser.Password;
                     }
                     user.Authorizations = foundedUser.Authorizations;
+                    
                     if (user.Email != foundedUser.Email) {
                         user.VerifyCode = utilities.makeVerifyCode(6);
-                        this.sendVerificationEmail(user);
+                        this.modifyVerificationEmail(user);
                     }
+
                     let updatedUser = this.repository.update(user.Id, user);
+                    
                     if (this.repository.model.state.isValid) {
+                        TokenManager.create(updatedUser);
                         this.HttpContext.response.updated(updatedUser);
                     }
                     else {
@@ -173,8 +188,8 @@ export default class AccountsController extends Controller {
                     this.HttpContext.response.notFound();
             } else
                 this.HttpContext.response.notImplemented();
-        } else
-            this.HttpContext.response.unAuthorized();
+        //} else
+          //  this.HttpContext.response.unAuthorized();
     }
     // GET:account/remove/id
     remove(id) { // warning! this is not an API endpoint
