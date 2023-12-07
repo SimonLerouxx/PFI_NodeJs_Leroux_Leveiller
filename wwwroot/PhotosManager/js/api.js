@@ -1,6 +1,8 @@
 ////////////////////////////////////////////// API photos_APIs call ///////////////////////////////////////////////////////
 
-const serverHost = "https://scented-better-sedum.glitch.me";
+//const serverHost = "https://scented-better-sedum.glitch.me";
+const serverHost = "http://localhost:5000";
+
 const photos_API = "/api/photos";
 
     
