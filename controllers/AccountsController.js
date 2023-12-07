@@ -157,21 +157,22 @@ export default class AccountsController extends Controller {
         // empty asset members imply no change and there values will be taken from the stored record
         //if (Authorizations.writeGranted(this.HttpContext, Authorizations.user())) {
             if (this.repository != null) {
+                
                 user.Created = utilities.nowInSeconds();
                 let foundedUser = this.repository.findByField("Id", user.Id);
+                console.log(foundedUser);
                 if (foundedUser != null) {
-                    user.Authorizations = foundedUser.Authorizations; // user cannot change its own authorizations
+                    //user.Authorizations = foundedUser.Authorizations; // user cannot change its own authorizations
                     user.VerifyCode = foundedUser.VerifyCode;
                     if (user.Password == '') { // password not changed
                         user.Password = foundedUser.Password;
                     }
-                    user.Authorizations = foundedUser.Authorizations;
+                    //user.Authorizations = foundedUser.Authorizations;
                     
                     if (user.Email != foundedUser.Email) {
                         user.VerifyCode = utilities.makeVerifyCode(6);
                         this.modifyVerificationEmail(user);
                     }
-
                     let updatedUser = this.repository.update(user.Id, user);
                     
                     if (this.repository.model.state.isValid) {

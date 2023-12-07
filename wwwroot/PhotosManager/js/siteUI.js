@@ -644,13 +644,12 @@ function renderManageUser() {
 
             $(".adminPromoteCmd").on("click", function () {
                 saveContentScrollPosition();
-                //console.log(result.data.find((user) => { return user["Id"] == $(this).attr("promoteCmdId") }));
+                console.log(result.data.find((user) => { return user["Id"] == $(this).attr("promoteCmdId") }));
 
                 let UpdateProfil = result.data.find((user) => { return user["Id"] == $(this).attr("promoteCmdId") });
                 UpdateProfil.Authorizations["readAccess"] = 2;
                 UpdateProfil.Authorizations["writeAccess"] = 2;
                 UpdateProfil.Avatar = UpdateProfil.Avatar.toString().slice(39,UpdateProfil.Avatar.length);
-                console.log(UpdateProfil);
                 modifyProfil(UpdateProfil);
                 renderManageUser();
             });
@@ -659,9 +658,9 @@ function renderManageUser() {
                 let UpdateProfil = result.data.find(user => user["Id"] == $(this).attr("demoteCmdId"));
                 UpdateProfil.Authorizations["readAccess"] = 1;
                 UpdateProfil.Authorizations["writeAccess"] = 1;
-                modifyProfil(UpdateProfil).then(() => {
-                    renderManageUser();
-                });
+                UpdateProfil.Avatar = UpdateProfil.Avatar.toString().slice(39,UpdateProfil.Avatar.length);
+                modifyProfil(UpdateProfil);
+                renderManageUser();
             });
             $(".deleteCmd").on("click", function () {
                 saveContentScrollPosition();
