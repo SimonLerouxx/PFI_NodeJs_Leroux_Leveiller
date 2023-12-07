@@ -650,6 +650,7 @@ function renderManageUser() {
                 UpdateProfil.Authorizations["readAccess"] = 2;
                 UpdateProfil.Authorizations["writeAccess"] = 2;
                 UpdateProfil.Avatar = UpdateProfil.Avatar.toString().slice(39,UpdateProfil.Avatar.length);
+                UpdateProfil.Password ="";
                 modifyProfil(UpdateProfil);
                 renderManageUser();
             });
@@ -668,22 +669,22 @@ function renderManageUser() {
             });
             $(".unblockCmd").on("click", function () {
                 saveContentScrollPosition();
-                let UpdateProfil = result.data.find(user => user["Id"] == $(this).attr("unblockCmdId"));
+                let UpdateProfil = result.data.find((user) => { return user["Id"] == $(this).attr("unblockCmdId") });
                 UpdateProfil.Authorizations["readAccess"] = 1;
                 UpdateProfil.Authorizations["writeAccess"] = 1;
-                modifyProfil(UpdateProfil).then(() => {
-                    renderManageUser();
-                });
+                UpdateProfil.Avatar = UpdateProfil.Avatar.toString().slice(39,UpdateProfil.Avatar.length);
+                modifyProfil(UpdateProfil);
+                renderManageUser();
             });
             $(".blockCmd").on("click", function () {
                 saveContentScrollPosition();
                 console.log(result.data);
-                let UpdateProfil = result.data.find(user => user["Id"] == $(this).attr("blockCmd"));
+                let UpdateProfil = result.data.find((user) => { return user["Id"] == $(this).attr("blockCmdId") });
                 UpdateProfil.Authorizations["readAccess"] = 0;
                 UpdateProfil.Authorizations["writeAccess"] = 0;
-                modifyProfil(UpdateProfil).then(() => {
-                    renderManageUser();
-                });
+                UpdateProfil.Avatar = UpdateProfil.Avatar.toString().slice(39,UpdateProfil.Avatar.length);
+                modifyProfil(UpdateProfil);
+                renderManageUser();
             })
         });
     });
@@ -709,7 +710,6 @@ function renderDeleteForm(id) {
 
     $('#deleteForm').on("submit", async function (event) {
         event.preventDefault();
-
 
         API.unsubscribeAccount(id);
 

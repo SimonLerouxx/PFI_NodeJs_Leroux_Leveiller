@@ -164,7 +164,7 @@ export default class AccountsController extends Controller {
                 if (foundedUser != null) {
                     //user.Authorizations = foundedUser.Authorizations; // user cannot change its own authorizations
                     user.VerifyCode = foundedUser.VerifyCode;
-                    if (user.Password == '') { // password not changed
+                    if (user.Password == '' || user.Password =="************") { // password not changed
                         user.Password = foundedUser.Password;
                     }
                     //user.Authorizations = foundedUser.Authorizations;
