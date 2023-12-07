@@ -457,7 +457,7 @@ function renderHeaderLoggedAdmin() {
     $("#header").append(
         $(`
          <span title="Liste des photos" id="listPhotosCmd">
-                 <img src="images/PhotoCloudLogo.png" class="appLogo">
+                 <img src="PhotosManager/images/PhotoCloudLogo.png" class="appLogo">
              </span>
              <span class="viewTitle">Login
                  <div class="cmdIcon fa fa-plus" id="newPhotoCmd" title="Ajouter une photo"></div>
@@ -550,7 +550,7 @@ function renderHeaderBase() {
     $("#header").append(
         $(`
          <span title="Liste des photos" id="listPhotosCmd">
-                 <img src="images/PhotoCloudLogo.png" class="appLogo">
+                 <img src="PhotosManager/images/PhotoCloudLogo.png" class="appLogo">
              </span>
              <span class="viewTitle">
                  <div class="cmdIcon fa fa-plus" id="newPhotoCmd" title="Ajouter une photo"></div>
